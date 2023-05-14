@@ -1,4 +1,10 @@
+#![allow(clippy::result_large_err)]
 use anchor_lang::prelude::*;
+
+mod state;
+use state::UpgradeConfig;
+
+mod error;
 
 declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
