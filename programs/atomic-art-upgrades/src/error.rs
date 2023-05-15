@@ -4,4 +4,6 @@ use anchor_lang::prelude::*;
 pub enum CustomError {
     #[msg("Incorrect Update Authority")]
     UpdateAuthorityMismatch,
+    #[msg("URI exceeds max length")]
+    UriExceedsMaxLength,
 }

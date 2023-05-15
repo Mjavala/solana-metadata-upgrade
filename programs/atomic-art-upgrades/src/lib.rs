@@ -2,9 +2,12 @@
 use anchor_lang::prelude::*;
 
 mod state;
-use state::UpgradeConfig;
+use state::*;
 
 mod error;
+
+mod instructions;
+use instructions::*;
 
 declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
@@ -12,10 +15,7 @@ declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 pub mod atomic_art_upgrades {
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
-        Ok(())
+    pub fn register_upgrade_config(ctx: Context<CreateUpgradeConfig>, config: UpgradeConfigParams) -> Result<()> {
+        create_upgrade_config_handler(ctx, config)
     }
 }
-
-#[derive(Accounts)]
-pub struct Initialize {}

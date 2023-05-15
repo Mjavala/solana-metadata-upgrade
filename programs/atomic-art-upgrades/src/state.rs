@@ -1,6 +1,5 @@
 use anchor_lang::prelude::*;
 use mpl_token_metadata::state::MAX_URI_LENGTH;
-use crate::error::CustomError;
 
 #[account]
 pub struct UpgradeConfig {
@@ -36,3 +35,12 @@ impl UpgradeConfig {
         ]
     }
 }
+
+#[derive(AnchorDeserialize, AnchorSerialize)]
+pub struct UpgradeConfigParams {
+    pub update_authority: Pubkey,
+    pub collection_mint: Pubkey,
+    pub base_uri: String,
+}
+
+
