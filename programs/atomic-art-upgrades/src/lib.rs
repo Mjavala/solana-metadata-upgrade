@@ -15,7 +15,11 @@ declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 pub mod atomic_art_upgrades {
     use super::*;
 
-    pub fn register_upgrade_config(ctx: Context<CreateUpgradeConfig>, config: UpgradeConfigParams) -> Result<()> {
+    pub fn register_upgrade_config(ctx: Context<CreateUpgradeConfig>, config: CreateUpgradeConfigParams) -> Result<()> {
         create_upgrade_config_handler(ctx, config)
+    }
+
+    pub fn update_upgrade_config(ctx: Context<UpdateUpgradeConfig>, config: UpdateUpgradeConfigParams) -> Result<()> {
+        update_upgrade_config_handler(ctx, config)
     }
 }

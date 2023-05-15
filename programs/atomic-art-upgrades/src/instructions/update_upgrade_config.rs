@@ -2,19 +2,17 @@ use anchor_lang::prelude::*;
 use mpl_token_metadata::state::MAX_URI_LENGTH;
 use anchor_spl::token::Mint;
 use crate::error::CustomError;
-use crate::state::{UpgradeConfig, CreateUpgradeConfigParams};
+use crate::state::{UpgradeConfig, UpdateUpgradeConfigParams};
 
 
 #[derive(Accounts)]
-pub struct CreateUpgradeConfig<'info> {
+pub struct UpdateUpgradeConfig<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
     #[account(
-        init,
+        mut,
         seeds = ["upgrade_config".as_bytes(), collection_mint.key().as_ref()],
-        payer = payer,
-        space = UpgradeConfig::LEN,
-        bump
+        bump = upgrade_config.bump,
     )]
     pub upgrade_config: Account<'info, UpgradeConfig>,
     #[account(
@@ -22,10 +20,9 @@ pub struct CreateUpgradeConfig<'info> {
         constraint = collection_mint.supply == 1,
     )]
     pub collection_mint: Account<'info, Mint>,
-    pub system_program: Program<'info, System>,
 }
 
-pub fn create_upgrade_config_handler(ctx: Context<CreateUpgradeConfig>, config: CreateUpgradeConfigParams) -> Result<()> {
+pub fn update_upgrade_config_handler(ctx: Context<UpdateUpgradeConfig>, config: UpdateUpgradeConfigParams) -> Result<()> {
     // Check the length of the metadata uri provided.
     require!(
         config.base_uri.len() <= MAX_URI_LENGTH,
@@ -33,14 +30,15 @@ pub fn create_upgrade_config_handler(ctx: Context<CreateUpgradeConfig>, config: 
     );
 
     let upgrade_config = &mut ctx.accounts.upgrade_config;
-    
-    **upgrade_config = UpgradeConfig::try_new(
-        config.base_uri,
-        config.update_authority,
-        config.collection_mint,
-        *ctx.bumps.get("upgrade_config").unwrap(),
-    )?;
+    // require payer to be upgrade authority
+    require!(
+        ctx.accounts.payer.key() == upgrade_config.update_authority,
+        CustomError::PayerMustBeUpdateAuthority,
+    );
+
+
+    upgrade_config.base_uri = config.base_uri;
+    upgrade_config.update_authority = config.update_authority;
 
     Ok(())
-
 }

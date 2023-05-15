@@ -76,5 +76,23 @@ describe("atomic-art-upgrades", () => {
     expect(upgradeConfig.collectionMint.toBase58()).to.equal(mint.toBase58());
     expect(upgradeConfig.updateAuthority.toBase58()).to.equal(authority.publicKey.toBase58());
     expect(upgradeConfig.bump).to.equal(bump);
+
+  });
+  it("Can update an existing upgrade config", async () => {
+    const newAuthority = Keypair.generate();
+    const newBaseUri = "https://arweave.net/5678";
+
+    client = await AtomicArtUpgradesClient.updateUpgradeConfig(
+      newAuthority.publicKey,
+      mint,
+      newBaseUri
+    )
+
+    const upgradeConfig = await program.account.upgradeConfig.fetch(client.upgradeConfigAddress);
+
+    expect(upgradeConfig.baseUri).to.equal(newBaseUri);
+    expect(upgradeConfig.collectionMint.toBase58()).to.equal(mint.toBase58());
+    expect(upgradeConfig.updateAuthority.toBase58()).to.equal(newAuthority.publicKey.toBase58());
+    expect(upgradeConfig.bump).to.equal(bump);
   });
 });

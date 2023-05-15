@@ -30,7 +30,35 @@ export type AtomicArtUpgrades = {
         {
           "name": "config",
           "type": {
-            "defined": "UpgradeConfigParams"
+            "defined": "CreateUpgradeConfigParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateUpgradeConfig",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "upgradeConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMint",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "config",
+          "type": {
+            "defined": "UpdateUpgradeConfigParams"
           }
         }
       ]
@@ -67,7 +95,7 @@ export type AtomicArtUpgrades = {
   ],
   "types": [
     {
-      "name": "UpgradeConfigParams",
+      "name": "CreateUpgradeConfigParams",
       "type": {
         "kind": "struct",
         "fields": [
@@ -77,6 +105,22 @@ export type AtomicArtUpgrades = {
           },
           {
             "name": "collectionMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "baseUri",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateUpgradeConfigParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "updateAuthority",
             "type": "publicKey"
           },
           {
@@ -97,6 +141,11 @@ export type AtomicArtUpgrades = {
       "code": 6001,
       "name": "UriExceedsMaxLength",
       "msg": "URI exceeds max length"
+    },
+    {
+      "code": 6002,
+      "name": "PayerMustBeUpdateAuthority",
+      "msg": "Payer must be update authority"
     }
   ]
 };
@@ -133,7 +182,35 @@ export const IDL: AtomicArtUpgrades = {
         {
           "name": "config",
           "type": {
-            "defined": "UpgradeConfigParams"
+            "defined": "CreateUpgradeConfigParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateUpgradeConfig",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "upgradeConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMint",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "config",
+          "type": {
+            "defined": "UpdateUpgradeConfigParams"
           }
         }
       ]
@@ -170,7 +247,7 @@ export const IDL: AtomicArtUpgrades = {
   ],
   "types": [
     {
-      "name": "UpgradeConfigParams",
+      "name": "CreateUpgradeConfigParams",
       "type": {
         "kind": "struct",
         "fields": [
@@ -180,6 +257,22 @@ export const IDL: AtomicArtUpgrades = {
           },
           {
             "name": "collectionMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "baseUri",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateUpgradeConfigParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "updateAuthority",
             "type": "publicKey"
           },
           {
@@ -200,6 +293,11 @@ export const IDL: AtomicArtUpgrades = {
       "code": 6001,
       "name": "UriExceedsMaxLength",
       "msg": "URI exceeds max length"
+    },
+    {
+      "code": 6002,
+      "name": "PayerMustBeUpdateAuthority",
+      "msg": "Payer must be update authority"
     }
   ]
 };

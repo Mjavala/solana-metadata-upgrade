@@ -6,4 +6,6 @@ pub enum CustomError {
     UpdateAuthorityMismatch,
     #[msg("URI exceeds max length")]
     UriExceedsMaxLength,
+    #[msg("Payer must be update authority")]
+    PayerMustBeUpdateAuthority,
 }

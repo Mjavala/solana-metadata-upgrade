@@ -37,9 +37,15 @@ impl UpgradeConfig {
 }
 
 #[derive(AnchorDeserialize, AnchorSerialize)]
-pub struct UpgradeConfigParams {
+pub struct CreateUpgradeConfigParams {
     pub update_authority: Pubkey,
     pub collection_mint: Pubkey,
+    pub base_uri: String,
+}
+
+#[derive(AnchorDeserialize, AnchorSerialize)]
+pub struct UpdateUpgradeConfigParams {
+    pub update_authority: Pubkey,
     pub base_uri: String,
 }
 

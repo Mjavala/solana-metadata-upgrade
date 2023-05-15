@@ -86,7 +86,7 @@ export class AtomicArtUpgradesClient {
         .accounts(accounts)
         .rpc()
         .then(() => {
-        confirm(client.provider.connection);
+            confirm(client.provider.connection);
         })
         .catch((err) => {
             console.log("Transaction error: ", err);
@@ -95,5 +95,40 @@ export class AtomicArtUpgradesClient {
         await client.init(upgradeConfigAddress[0]);
 
         return client;
+    }
+
+    public static async updateUpgradeConfig(
+        updateAuthority: PublicKey,
+        collectionMint: PublicKey,
+        baseUri: string,
+    ): Promise<AtomicArtUpgradesClient> {
+        const client = new AtomicArtUpgradesClient(setUpAnchor());
+
+        const upgradeConfigAddress = await AtomicArtUpgradesClient.getUpgradeConfigAddress(collectionMint);
+
+        const accounts = {
+            payer: client.provider.wallet.publicKey,
+            upgradeConfig: upgradeConfigAddress[0],
+            collectionMint,
+        };
+
+        await client.program.methods
+            .updateUpgradeConfig({
+                    updateAuthority,
+                    baseUri,
+            })
+            .accounts(accounts)
+            .rpc()
+            .then(() => {
+                confirm(client.provider.connection);
+            })
+            .catch((err) => {
+                console.log("Transaction error: ", err);
+            });
+
+        await client.init(upgradeConfigAddress[0]);
+
+        return client;
+
     }
 }
