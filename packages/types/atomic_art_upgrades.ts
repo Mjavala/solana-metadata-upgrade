@@ -62,6 +62,42 @@ export type AtomicArtUpgrades = {
           }
         }
       ]
+    },
+    {
+      "name": "relinquishUpdateAuthority",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "upgradeConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "newUpdateAuthority",
+          "type": "publicKey"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -87,7 +123,12 @@ export type AtomicArtUpgrades = {
             "docs": [
               "The bump nonce for the collections PDA (1)."
             ],
-            "type": "u8"
+            "type": {
+              "array": [
+                "u8",
+                1
+              ]
+            }
           }
         ]
       }
@@ -146,6 +187,11 @@ export type AtomicArtUpgrades = {
       "code": 6002,
       "name": "PayerMustBeUpdateAuthority",
       "msg": "Payer must be update authority"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidMetadataAccount",
+      "msg": "Invalid Metadata Account"
     }
   ]
 };
@@ -214,6 +260,42 @@ export const IDL: AtomicArtUpgrades = {
           }
         }
       ]
+    },
+    {
+      "name": "relinquishUpdateAuthority",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "upgradeConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "newUpdateAuthority",
+          "type": "publicKey"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -239,7 +321,12 @@ export const IDL: AtomicArtUpgrades = {
             "docs": [
               "The bump nonce for the collections PDA (1)."
             ],
-            "type": "u8"
+            "type": {
+              "array": [
+                "u8",
+                1
+              ]
+            }
           }
         ]
       }
@@ -298,6 +385,11 @@ export const IDL: AtomicArtUpgrades = {
       "code": 6002,
       "name": "PayerMustBeUpdateAuthority",
       "msg": "Payer must be update authority"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidMetadataAccount",
+      "msg": "Invalid Metadata Account"
     }
   ]
 };

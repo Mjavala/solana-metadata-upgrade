@@ -10,7 +10,7 @@ pub struct UpgradeConfig {
     // the base uri for all tokens in this collection (4 + mpl_token_metadata::state::MAX_URI_LENGTH)
     pub base_uri: String,
     /// The bump nonce for the collections PDA (1).
-    pub bump: u8,
+    pub bump: [u8; 1],
 }
 
 impl UpgradeConfig {
@@ -24,14 +24,15 @@ impl UpgradeConfig {
             update_authority,
             collection_mint,
             base_uri,
-            bump,
+            bump: [bump],
         })
     }
 
-    pub fn as_seeds(&self) -> [&[u8]; 2] {
+    pub fn as_seeds(&self) -> [&[u8]; 3] {
         [
-            b"upgrade_config",
+            "upgrade_config".as_bytes(),
             self.collection_mint.as_ref(),
+            &self.bump
         ]
     }
 }

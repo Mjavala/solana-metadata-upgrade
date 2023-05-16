@@ -5,6 +5,7 @@ mod state;
 use state::*;
 
 mod error;
+mod validation;
 
 mod instructions;
 use instructions::*;
@@ -21,5 +22,9 @@ pub mod atomic_art_upgrades {
 
     pub fn update_upgrade_config(ctx: Context<UpdateUpgradeConfig>, config: UpdateUpgradeConfigParams) -> Result<()> {
         update_upgrade_config_handler(ctx, config)
+    }
+
+    pub fn relinquish_update_authority(ctx: Context<RelinquishUpdateAuthority>, new_update_authority: Pubkey) -> Result<()> {
+        relinquish_update_authority_handler(ctx, new_update_authority)
     }
 }

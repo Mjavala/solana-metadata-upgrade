@@ -8,4 +8,6 @@ pub enum CustomError {
     UriExceedsMaxLength,
     #[msg("Payer must be update authority")]
     PayerMustBeUpdateAuthority,
+    #[msg("Invalid Metadata Account")]
+    InvalidMetadataAccount,
 }

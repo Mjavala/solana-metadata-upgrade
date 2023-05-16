@@ -1,17 +1,19 @@
 import * as anchor from "@coral-xyz/anchor";
+import { AnchorProvider } from "@coral-xyz/anchor";
 import { PublicKey, SystemProgram, Connection } from "@solana/web3.js";
 import { AtomicArtUpgrades, IDL } from "../types/atomic_art_upgrades";
+import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
+import { Metaplex, walletAdapterIdentity } from "@metaplex-foundation/js";
 
 export const PROGRAM_ID = new PublicKey(
     "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 );
 
-export const setUpAnchor = (): anchor.AnchorProvider => {
-    // Configure the client to use the local cluster.
-    const provider = anchor.AnchorProvider.env();
-    anchor.setProvider(provider);
-  
-    return provider;
+export const METADATA_PROGRAM_ID = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
+
+
+export const setUpAnchor = (wallet?: NodeWallet) => {
+    return wallet ? new AnchorProvider(AnchorProvider.env().connection, wallet, AnchorProvider.env().opts) : AnchorProvider.env();  
 };
 
 export const confirm = (connection: Connection) => async (txSig: string) =>
@@ -29,11 +31,13 @@ export interface AtomicArtUpgradesConfig {
 
 export class AtomicArtUpgradesClient {
     config: AtomicArtUpgradesConfig | undefined;
-    readonly program: anchor.Program<AtomicArtUpgrades>;
     upgradeConfigAddress: PublicKey | undefined;
+    readonly metaplex: Metaplex;
+    readonly program: anchor.Program<AtomicArtUpgrades>;
 
     constructor(readonly provider: anchor.AnchorProvider) {
         this.program = new anchor.Program(IDL, PROGRAM_ID, provider);
+        this.metaplex = Metaplex.make(provider.connection).use(walletAdapterIdentity(provider.wallet))
     }
 
     private async init(upgradeConfigAddress: PublicKey) {
@@ -88,10 +92,6 @@ export class AtomicArtUpgradesClient {
         .then(() => {
             confirm(client.provider.connection);
         })
-        .catch((err) => {
-            console.log("Transaction error: ", err);
-        });
-
         await client.init(upgradeConfigAddress[0]);
 
         return client;
@@ -101,8 +101,9 @@ export class AtomicArtUpgradesClient {
         updateAuthority: PublicKey,
         collectionMint: PublicKey,
         baseUri: string,
+        wallet?: NodeWallet,
     ): Promise<AtomicArtUpgradesClient> {
-        const client = new AtomicArtUpgradesClient(setUpAnchor());
+        const client = new AtomicArtUpgradesClient(setUpAnchor(wallet));
 
         const upgradeConfigAddress = await AtomicArtUpgradesClient.getUpgradeConfigAddress(collectionMint);
 
@@ -122,9 +123,35 @@ export class AtomicArtUpgradesClient {
             .then(() => {
                 confirm(client.provider.connection);
             })
-            .catch((err) => {
-                console.log("Transaction error: ", err);
-            });
+
+        await client.init(upgradeConfigAddress[0]);
+
+        return client;
+    }
+
+    public static async relinquishUpgradeAuthority(
+        updateAuthority: PublicKey,
+        collectionMint: PublicKey,
+        mint: PublicKey,
+        metadata: PublicKey,
+    ): Promise<AtomicArtUpgradesClient> {
+        const client = new AtomicArtUpgradesClient(setUpAnchor());
+
+        const upgradeConfigAddress = await AtomicArtUpgradesClient.getUpgradeConfigAddress(collectionMint);
+
+        const accounts = {
+            payer: client.provider.wallet.publicKey,
+            upgradeConfig: upgradeConfigAddress[0],
+            mint,
+            metadata,
+            tokenMetadataProgram: METADATA_PROGRAM_ID
+        };
+
+        await client.program.methods
+            .relinquishUpdateAuthority(updateAuthority)
+            .accounts(accounts)
+            .rpc()
+            .then(() => {confirm(client.provider.connection)})
 
         await client.init(upgradeConfigAddress[0]);
 

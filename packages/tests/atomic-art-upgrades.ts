@@ -1,5 +1,5 @@
 import * as anchor from "@coral-xyz/anchor";
-import { Program } from "@coral-xyz/anchor";
+import { AnchorProvider, Program } from "@coral-xyz/anchor";
 import { AtomicArtUpgrades } from "../../target/types/atomic_art_upgrades";
 import { PROGRAM_ID, AtomicArtUpgradesClient } from "../client";
 import { expect } from "chai";
@@ -7,6 +7,8 @@ import { expect } from "chai";
 import testAuthority from "./fixtures/id.json";
 import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { Account, createMint, getOrCreateAssociatedTokenAccount, mintToChecked } from "@solana/spl-token";
+import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
+import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
 
 const program = anchor.workspace
   .TreasuryController as Program<AtomicArtUpgrades>;
@@ -17,7 +19,11 @@ describe("atomic-art-upgrades", () => {
 
   const program = anchor.workspace.AtomicArtUpgrades as Program<AtomicArtUpgrades>;
   const authority = Keypair.fromSecretKey(Uint8Array.from(testAuthority));
+  const badAuthority = Keypair.generate();
+  const newAuthority = Keypair.generate();
   const baseUri = "https://arweave.net/1234";
+  const metaplex = Metaplex.make(program.provider.connection).use(keypairIdentity(authority))
+
 
   let client: AtomicArtUpgradesClient;
   let mint: anchor.web3.PublicKey;
@@ -59,6 +65,14 @@ describe("atomic-art-upgrades", () => {
     await program.provider.connection
       .requestAirdrop(authority.publicKey, 100 * LAMPORTS_PER_SOL)
       .then(async (sig) => program.provider.connection.confirmTransaction(sig));
+
+      await program.provider.connection
+      .requestAirdrop(newAuthority.publicKey, 100 * LAMPORTS_PER_SOL)
+      .then(async (sig) => program.provider.connection.confirmTransaction(sig));
+
+      await program.provider.connection
+      .requestAirdrop(badAuthority.publicKey, 100 * LAMPORTS_PER_SOL)
+      .then(async (sig) => program.provider.connection.confirmTransaction(sig));
   });
 
   it("Can register a new upgrade config", async () => {
@@ -75,11 +89,27 @@ describe("atomic-art-upgrades", () => {
     expect(upgradeConfig.baseUri).to.equal(baseUri);
     expect(upgradeConfig.collectionMint.toBase58()).to.equal(mint.toBase58());
     expect(upgradeConfig.updateAuthority.toBase58()).to.equal(authority.publicKey.toBase58());
-    expect(upgradeConfig.bump).to.equal(bump);
+    expect(upgradeConfig.bump[0]).to.equal(bump);
 
   });
+  it("Cannot update an upgrade config without update authority", async () => {
+    const newBaseUri = "https://arweave.net/5678";
+
+    const client = new AtomicArtUpgradesClient(new AnchorProvider(AnchorProvider.env().connection, new NodeWallet(badAuthority), AnchorProvider.env().opts))
+
+    try {
+      await AtomicArtUpgradesClient.updateUpgradeConfig(
+        badAuthority.publicKey,
+        mint,
+        newBaseUri,
+        new NodeWallet(badAuthority)
+      );
+    } catch (error) {
+      const e = error as anchor.AnchorError;
+      expect(e.error.errorCode.code).to.equal("PayerMustBeUpdateAuthority");
+    }
+  });
   it("Can update an existing upgrade config", async () => {
-    const newAuthority = Keypair.generate();
     const newBaseUri = "https://arweave.net/5678";
 
     client = await AtomicArtUpgradesClient.updateUpgradeConfig(
@@ -93,6 +123,47 @@ describe("atomic-art-upgrades", () => {
     expect(upgradeConfig.baseUri).to.equal(newBaseUri);
     expect(upgradeConfig.collectionMint.toBase58()).to.equal(mint.toBase58());
     expect(upgradeConfig.updateAuthority.toBase58()).to.equal(newAuthority.publicKey.toBase58());
-    expect(upgradeConfig.bump).to.equal(bump);
+    expect(upgradeConfig.bump[0]).to.equal(bump);
+  });
+  it("PDA can relinquish authority", async () => {
+    // create nft
+    const { nft } = await metaplex.nfts().create({
+      uri: "https://arweave.net/123",
+      name: "My NFT",
+      sellerFeeBasisPoints: 500, // Represents 5.00%.
+    });
+    expect(nft.updateAuthorityAddress.toBase58()).to.equal(authority.publicKey.toBase58());
+    // update nfts update authority to be the upgrade config address
+    await metaplex.nfts().update(
+      {
+        nftOrSft: nft,
+        newUpdateAuthority: upgradeConfigAddress,
+      })
+
+    let updatedNft = await metaplex.nfts().refresh(nft);
+
+    expect(updatedNft.updateAuthorityAddress.toBase58()).to.equal(upgradeConfigAddress.toBase58());
+
+    await AtomicArtUpgradesClient.updateUpgradeConfig(
+      authority.publicKey,
+      mint,
+      "https://arweave.net/123",
+      new NodeWallet(newAuthority)
+    )
+    try {
+      // relinquish authority
+      await AtomicArtUpgradesClient.relinquishUpgradeAuthority(
+        authority.publicKey,
+        mint,
+        nft.address,
+        nft.metadataAddress
+      );
+
+      updatedNft = await metaplex.nfts().refresh(nft);
+
+      expect(nft.updateAuthorityAddress.toBase58()).to.equal(authority.publicKey.toBase58());
+    } catch (e) {
+      console.log(e);
+    }
   });
 });

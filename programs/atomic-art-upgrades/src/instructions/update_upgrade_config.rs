@@ -12,7 +12,7 @@ pub struct UpdateUpgradeConfig<'info> {
     #[account(
         mut,
         seeds = ["upgrade_config".as_bytes(), collection_mint.key().as_ref()],
-        bump = upgrade_config.bump,
+        bump = upgrade_config.bump[0],
     )]
     pub upgrade_config: Account<'info, UpgradeConfig>,
     #[account(
