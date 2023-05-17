@@ -47,7 +47,7 @@ export class AtomicArtUpgradesClient {
             updateAuthority: upgradeConfig.updateAuthority,
             collection: upgradeConfig.collectionMint,
             baseUri: upgradeConfig.baseUri,
-            bump: upgradeConfig.bump,
+            bump: upgradeConfig.bump[0],
         };
 
         this.upgradeConfigAddress = upgradeConfigAddress;
@@ -157,5 +157,33 @@ export class AtomicArtUpgradesClient {
 
         return client;
 
+    }
+
+    public static async upgradeMetadata(
+        collectionMint: PublicKey,
+        mint: PublicKey,
+        metadata: PublicKey,
+    ): Promise<AtomicArtUpgradesClient> {
+        const client = new AtomicArtUpgradesClient(setUpAnchor());
+
+        const upgradeConfigAddress = await AtomicArtUpgradesClient.getUpgradeConfigAddress(collectionMint);
+
+        const accounts = {
+            payer: client.provider.wallet.publicKey,
+            upgradeConfig: upgradeConfigAddress[0],
+            mint,
+            metadata,
+            tokenMetadataProgram: METADATA_PROGRAM_ID
+        };
+
+        await client.program.methods
+            .upgradeMetadata()
+            .accounts(accounts)
+            .rpc()
+            .then(() => {confirm(client.provider.connection)})
+
+        await client.init(upgradeConfigAddress[0]);
+
+        return client;
     }
 }

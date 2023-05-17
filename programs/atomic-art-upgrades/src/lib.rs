@@ -27,4 +27,8 @@ pub mod atomic_art_upgrades {
     pub fn relinquish_update_authority(ctx: Context<RelinquishUpdateAuthority>, new_update_authority: Pubkey) -> Result<()> {
         relinquish_update_authority_handler(ctx, new_update_authority)
     }
+
+    pub fn upgrade_metadata(ctx: Context<UpgradeMetadata>) -> Result<()> {
+        upgrade_metadata_handler(ctx)
+    }
 }

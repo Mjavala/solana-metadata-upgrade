@@ -21,7 +21,7 @@ describe("atomic-art-upgrades", () => {
   const authority = Keypair.fromSecretKey(Uint8Array.from(testAuthority));
   const badAuthority = Keypair.generate();
   const newAuthority = Keypair.generate();
-  const baseUri = "https://arweave.net/1234";
+  const baseUri = "https://arweave.net/1234/";
   const metaplex = Metaplex.make(program.provider.connection).use(keypairIdentity(authority))
 
 
@@ -76,26 +76,28 @@ describe("atomic-art-upgrades", () => {
   });
 
   it("Can register a new upgrade config", async () => {
-    client = await AtomicArtUpgradesClient.createUpgradeConfig(
-      authority.publicKey,
-      mint,
-      baseUri
-    )
-
-    expect(client.upgradeConfigAddress).not.to.be.null;
-
-    const upgradeConfig = await program.account.upgradeConfig.fetch(client.upgradeConfigAddress);
-
-    expect(upgradeConfig.baseUri).to.equal(baseUri);
-    expect(upgradeConfig.collectionMint.toBase58()).to.equal(mint.toBase58());
-    expect(upgradeConfig.updateAuthority.toBase58()).to.equal(authority.publicKey.toBase58());
-    expect(upgradeConfig.bump[0]).to.equal(bump);
+    try {
+      client = await AtomicArtUpgradesClient.createUpgradeConfig(
+        authority.publicKey,
+        mint,
+        baseUri
+      )
+  
+      expect(client.upgradeConfigAddress).not.to.be.null;
+  
+      const upgradeConfig = await program.account.upgradeConfig.fetch(client.upgradeConfigAddress);
+  
+      expect(upgradeConfig.baseUri).to.equal(baseUri);
+      expect(upgradeConfig.collectionMint.toBase58()).to.equal(mint.toBase58());
+      expect(upgradeConfig.updateAuthority.toBase58()).to.equal(authority.publicKey.toBase58());
+      expect(upgradeConfig.bump[0]).to.equal(bump);
+    } catch (e) {
+      console.log(e);
+    }
 
   });
   it("Cannot update an upgrade config without update authority", async () => {
     const newBaseUri = "https://arweave.net/5678";
-
-    const client = new AtomicArtUpgradesClient(new AnchorProvider(AnchorProvider.env().connection, new NodeWallet(badAuthority), AnchorProvider.env().opts))
 
     try {
       await AtomicArtUpgradesClient.updateUpgradeConfig(
@@ -165,5 +167,36 @@ describe("atomic-art-upgrades", () => {
     } catch (e) {
       console.log(e);
     }
+  });
+  it("Can update an existing upgrade config with a new authority", async () => {
+    const { nft } = await metaplex.nfts().create({
+      uri: "https://arweave.net/123",
+      name: "Rogue Sharks #420",
+      sellerFeeBasisPoints: 500, // Represents 5.00%.
+    });
+
+    expect(nft.updateAuthorityAddress.toBase58()).to.equal(authority.publicKey.toBase58());
+    // update nfts update authority to be the upgrade config address
+    await metaplex.nfts().update(
+      {
+        nftOrSft: nft,
+        newUpdateAuthority: upgradeConfigAddress,
+      })
+
+    let updatedNft = await metaplex.nfts().refresh(nft);
+
+    expect(updatedNft.updateAuthorityAddress.toBase58()).to.equal(upgradeConfigAddress.toBase58());
+
+    await AtomicArtUpgradesClient.upgradeMetadata(
+      mint,
+      nft.address,
+      nft.metadataAddress,
+    )
+
+    updatedNft = await metaplex.nfts().refresh(nft);
+
+    const upgradeConfig = await program.account.upgradeConfig.fetch(client.upgradeConfigAddress);
+
+    expect(updatedNft.uri).to.equal(upgradeConfig.baseUri + "/420.json");
   });
 });

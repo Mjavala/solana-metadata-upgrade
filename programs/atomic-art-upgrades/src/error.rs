@@ -10,4 +10,6 @@ pub enum CustomError {
     PayerMustBeUpdateAuthority,
     #[msg("Invalid Metadata Account")]
     InvalidMetadataAccount,
+    #[msg("Invalid Metadata Name Field")]
+    InvalidMetadataNameField,
 }

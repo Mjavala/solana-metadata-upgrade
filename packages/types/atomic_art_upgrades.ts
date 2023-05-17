@@ -98,6 +98,37 @@ export type AtomicArtUpgrades = {
           "type": "publicKey"
         }
       ]
+    },
+    {
+      "name": "upgradeMetadata",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "upgradeConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -192,6 +223,11 @@ export type AtomicArtUpgrades = {
       "code": 6003,
       "name": "InvalidMetadataAccount",
       "msg": "Invalid Metadata Account"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidMetadataNameField",
+      "msg": "Invalid Metadata Name Field"
     }
   ]
 };
@@ -296,6 +332,37 @@ export const IDL: AtomicArtUpgrades = {
           "type": "publicKey"
         }
       ]
+    },
+    {
+      "name": "upgradeMetadata",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "upgradeConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -390,6 +457,11 @@ export const IDL: AtomicArtUpgrades = {
       "code": 6003,
       "name": "InvalidMetadataAccount",
       "msg": "Invalid Metadata Account"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidMetadataNameField",
+      "msg": "Invalid Metadata Name Field"
     }
   ]
 };
