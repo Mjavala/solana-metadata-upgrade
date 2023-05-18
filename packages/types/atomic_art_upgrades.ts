@@ -1,467 +1,447 @@
 export type AtomicArtUpgrades = {
-  "version": "0.1.0",
-  "name": "atomic_art_upgrades",
-  "instructions": [
+  version: "0.1.0";
+  name: "atomic_art_upgrades";
+  instructions: [
     {
-      "name": "registerUpgradeConfig",
-      "accounts": [
+      name: "registerUpgradeConfig";
+      accounts: [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
+          name: "payer";
+          isMut: true;
+          isSigner: true;
         },
         {
-          "name": "upgradeConfig",
-          "isMut": true,
-          "isSigner": false
+          name: "upgradeConfig";
+          isMut: true;
+          isSigner: false;
         },
         {
-          "name": "collectionMint",
-          "isMut": false,
-          "isSigner": false
+          name: "collectionMint";
+          isMut: false;
+          isSigner: false;
         },
         {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
+          name: "systemProgram";
+          isMut: false;
+          isSigner: false;
         }
-      ],
-      "args": [
+      ];
+      args: [
         {
-          "name": "config",
-          "type": {
-            "defined": "CreateUpgradeConfigParams"
-          }
+          name: "config";
+          type: {
+            defined: "CreateUpgradeConfigParams";
+          };
         }
-      ]
+      ];
     },
     {
-      "name": "updateUpgradeConfig",
-      "accounts": [
+      name: "updateUpgradeConfig";
+      accounts: [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
+          name: "payer";
+          isMut: true;
+          isSigner: true;
         },
         {
-          "name": "upgradeConfig",
-          "isMut": true,
-          "isSigner": false
+          name: "upgradeConfig";
+          isMut: true;
+          isSigner: false;
         },
         {
-          "name": "collectionMint",
-          "isMut": false,
-          "isSigner": false
+          name: "collectionMint";
+          isMut: false;
+          isSigner: false;
         }
-      ],
-      "args": [
+      ];
+      args: [
         {
-          "name": "config",
-          "type": {
-            "defined": "UpdateUpgradeConfigParams"
-          }
+          name: "config";
+          type: {
+            defined: "UpdateUpgradeConfigParams";
+          };
         }
-      ]
+      ];
     },
     {
-      "name": "relinquishUpdateAuthority",
-      "accounts": [
+      name: "relinquishUpdateAuthority";
+      accounts: [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
+          name: "payer";
+          isMut: true;
+          isSigner: true;
         },
         {
-          "name": "upgradeConfig",
-          "isMut": true,
-          "isSigner": false
+          name: "upgradeConfig";
+          isMut: true;
+          isSigner: false;
         },
         {
-          "name": "mint",
-          "isMut": true,
-          "isSigner": false
+          name: "mint";
+          isMut: true;
+          isSigner: false;
         },
         {
-          "name": "metadata",
-          "isMut": true,
-          "isSigner": false
+          name: "metadata";
+          isMut: true;
+          isSigner: false;
         },
         {
-          "name": "tokenMetadataProgram",
-          "isMut": false,
-          "isSigner": false
+          name: "tokenMetadataProgram";
+          isMut: false;
+          isSigner: false;
         }
-      ],
-      "args": [
+      ];
+      args: [
         {
-          "name": "newUpdateAuthority",
-          "type": "publicKey"
+          name: "newUpdateAuthority";
+          type: "publicKey";
         }
-      ]
+      ];
     },
     {
-      "name": "upgradeMetadata",
-      "accounts": [
+      name: "upgradeMetadata";
+      accounts: [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
+          name: "payer";
+          isMut: true;
+          isSigner: true;
         },
         {
-          "name": "upgradeConfig",
-          "isMut": true,
-          "isSigner": false
+          name: "upgradeConfig";
+          isMut: true;
+          isSigner: false;
         },
         {
-          "name": "mint",
-          "isMut": true,
-          "isSigner": false
+          name: "mint";
+          isMut: true;
+          isSigner: false;
         },
         {
-          "name": "metadata",
-          "isMut": true,
-          "isSigner": false
+          name: "metadata";
+          isMut: true;
+          isSigner: false;
         },
         {
-          "name": "tokenMetadataProgram",
-          "isMut": false,
-          "isSigner": false
+          name: "tokenMetadataProgram";
+          isMut: false;
+          isSigner: false;
         }
-      ],
-      "args": []
+      ];
+      args: [];
     }
-  ],
-  "accounts": [
+  ];
+  accounts: [
     {
-      "name": "upgradeConfig",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "upgradeConfig";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "updateAuthority",
-            "type": "publicKey"
+            name: "updateAuthority";
+            type: "publicKey";
           },
           {
-            "name": "collectionMint",
-            "type": "publicKey"
+            name: "collectionMint";
+            type: "publicKey";
           },
           {
-            "name": "baseUri",
-            "type": "string"
+            name: "baseUri";
+            type: "string";
           },
           {
-            "name": "bump",
-            "docs": [
-              "The bump nonce for the collections PDA (1)."
-            ],
-            "type": {
-              "array": [
-                "u8",
-                1
-              ]
-            }
+            name: "bump";
+            docs: ["The bump nonce for the collections PDA (1)."];
+            type: {
+              array: ["u8", 1];
+            };
           }
-        ]
-      }
+        ];
+      };
     }
-  ],
-  "types": [
+  ];
+  types: [
     {
-      "name": "CreateUpgradeConfigParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "CreateUpgradeConfigParams";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "updateAuthority",
-            "type": "publicKey"
+            name: "updateAuthority";
+            type: "publicKey";
           },
           {
-            "name": "collectionMint",
-            "type": "publicKey"
+            name: "collectionMint";
+            type: "publicKey";
           },
           {
-            "name": "baseUri",
-            "type": "string"
+            name: "baseUri";
+            type: "string";
           }
-        ]
-      }
+        ];
+      };
     },
     {
-      "name": "UpdateUpgradeConfigParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "UpdateUpgradeConfigParams";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "updateAuthority",
-            "type": "publicKey"
+            name: "updateAuthority";
+            type: "publicKey";
           },
           {
-            "name": "baseUri",
-            "type": "string"
+            name: "baseUri";
+            type: "string";
           }
-        ]
-      }
+        ];
+      };
     }
-  ],
-  "errors": [
+  ];
+  errors: [
     {
-      "code": 6000,
-      "name": "UpdateAuthorityMismatch",
-      "msg": "Incorrect Update Authority"
+      code: 6000;
+      name: "UriExceedsMaxLength";
+      msg: "URI exceeds max length";
     },
     {
-      "code": 6001,
-      "name": "UriExceedsMaxLength",
-      "msg": "URI exceeds max length"
+      code: 6001;
+      name: "PayerMustBeUpdateAuthority";
+      msg: "Payer must be update authority";
     },
     {
-      "code": 6002,
-      "name": "PayerMustBeUpdateAuthority",
-      "msg": "Payer must be update authority"
+      code: 6002;
+      name: "InvalidMetadataAccount";
+      msg: "Invalid Metadata Account";
     },
     {
-      "code": 6003,
-      "name": "InvalidMetadataAccount",
-      "msg": "Invalid Metadata Account"
-    },
-    {
-      "code": 6004,
-      "name": "InvalidMetadataNameField",
-      "msg": "Invalid Metadata Name Field"
+      code: 6003;
+      name: "InvalidMetadataNameField";
+      msg: "Invalid Metadata Name Field";
     }
-  ]
+  ];
 };
 
 export const IDL: AtomicArtUpgrades = {
-  "version": "0.1.0",
-  "name": "atomic_art_upgrades",
-  "instructions": [
+  version: "0.1.0",
+  name: "atomic_art_upgrades",
+  instructions: [
     {
-      "name": "registerUpgradeConfig",
-      "accounts": [
+      name: "registerUpgradeConfig",
+      accounts: [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
+          name: "payer",
+          isMut: true,
+          isSigner: true,
         },
         {
-          "name": "upgradeConfig",
-          "isMut": true,
-          "isSigner": false
+          name: "upgradeConfig",
+          isMut: true,
+          isSigner: false,
         },
         {
-          "name": "collectionMint",
-          "isMut": false,
-          "isSigner": false
+          name: "collectionMint",
+          isMut: false,
+          isSigner: false,
         },
         {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
+          name: "systemProgram",
+          isMut: false,
+          isSigner: false,
+        },
       ],
-      "args": [
+      args: [
         {
-          "name": "config",
-          "type": {
-            "defined": "CreateUpgradeConfigParams"
-          }
-        }
-      ]
+          name: "config",
+          type: {
+            defined: "CreateUpgradeConfigParams",
+          },
+        },
+      ],
     },
     {
-      "name": "updateUpgradeConfig",
-      "accounts": [
+      name: "updateUpgradeConfig",
+      accounts: [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
+          name: "payer",
+          isMut: true,
+          isSigner: true,
         },
         {
-          "name": "upgradeConfig",
-          "isMut": true,
-          "isSigner": false
+          name: "upgradeConfig",
+          isMut: true,
+          isSigner: false,
         },
         {
-          "name": "collectionMint",
-          "isMut": false,
-          "isSigner": false
-        }
+          name: "collectionMint",
+          isMut: false,
+          isSigner: false,
+        },
       ],
-      "args": [
+      args: [
         {
-          "name": "config",
-          "type": {
-            "defined": "UpdateUpgradeConfigParams"
-          }
-        }
-      ]
+          name: "config",
+          type: {
+            defined: "UpdateUpgradeConfigParams",
+          },
+        },
+      ],
     },
     {
-      "name": "relinquishUpdateAuthority",
-      "accounts": [
+      name: "relinquishUpdateAuthority",
+      accounts: [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
+          name: "payer",
+          isMut: true,
+          isSigner: true,
         },
         {
-          "name": "upgradeConfig",
-          "isMut": true,
-          "isSigner": false
+          name: "upgradeConfig",
+          isMut: true,
+          isSigner: false,
         },
         {
-          "name": "mint",
-          "isMut": true,
-          "isSigner": false
+          name: "mint",
+          isMut: true,
+          isSigner: false,
         },
         {
-          "name": "metadata",
-          "isMut": true,
-          "isSigner": false
+          name: "metadata",
+          isMut: true,
+          isSigner: false,
         },
         {
-          "name": "tokenMetadataProgram",
-          "isMut": false,
-          "isSigner": false
-        }
+          name: "tokenMetadataProgram",
+          isMut: false,
+          isSigner: false,
+        },
       ],
-      "args": [
+      args: [
         {
-          "name": "newUpdateAuthority",
-          "type": "publicKey"
-        }
-      ]
+          name: "newUpdateAuthority",
+          type: "publicKey",
+        },
+      ],
     },
     {
-      "name": "upgradeMetadata",
-      "accounts": [
+      name: "upgradeMetadata",
+      accounts: [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
+          name: "payer",
+          isMut: true,
+          isSigner: true,
         },
         {
-          "name": "upgradeConfig",
-          "isMut": true,
-          "isSigner": false
+          name: "upgradeConfig",
+          isMut: true,
+          isSigner: false,
         },
         {
-          "name": "mint",
-          "isMut": true,
-          "isSigner": false
+          name: "mint",
+          isMut: true,
+          isSigner: false,
         },
         {
-          "name": "metadata",
-          "isMut": true,
-          "isSigner": false
+          name: "metadata",
+          isMut: true,
+          isSigner: false,
         },
         {
-          "name": "tokenMetadataProgram",
-          "isMut": false,
-          "isSigner": false
-        }
+          name: "tokenMetadataProgram",
+          isMut: false,
+          isSigner: false,
+        },
       ],
-      "args": []
-    }
+      args: [],
+    },
   ],
-  "accounts": [
+  accounts: [
     {
-      "name": "upgradeConfig",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "upgradeConfig",
+      type: {
+        kind: "struct",
+        fields: [
           {
-            "name": "updateAuthority",
-            "type": "publicKey"
+            name: "updateAuthority",
+            type: "publicKey",
           },
           {
-            "name": "collectionMint",
-            "type": "publicKey"
+            name: "collectionMint",
+            type: "publicKey",
           },
           {
-            "name": "baseUri",
-            "type": "string"
+            name: "baseUri",
+            type: "string",
           },
           {
-            "name": "bump",
-            "docs": [
-              "The bump nonce for the collections PDA (1)."
-            ],
-            "type": {
-              "array": [
-                "u8",
-                1
-              ]
-            }
-          }
-        ]
-      }
-    }
+            name: "bump",
+            docs: ["The bump nonce for the collections PDA (1)."],
+            type: {
+              array: ["u8", 1],
+            },
+          },
+        ],
+      },
+    },
   ],
-  "types": [
+  types: [
     {
-      "name": "CreateUpgradeConfigParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "CreateUpgradeConfigParams",
+      type: {
+        kind: "struct",
+        fields: [
           {
-            "name": "updateAuthority",
-            "type": "publicKey"
+            name: "updateAuthority",
+            type: "publicKey",
           },
           {
-            "name": "collectionMint",
-            "type": "publicKey"
+            name: "collectionMint",
+            type: "publicKey",
           },
           {
-            "name": "baseUri",
-            "type": "string"
-          }
-        ]
-      }
+            name: "baseUri",
+            type: "string",
+          },
+        ],
+      },
     },
     {
-      "name": "UpdateUpgradeConfigParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "UpdateUpgradeConfigParams",
+      type: {
+        kind: "struct",
+        fields: [
           {
-            "name": "updateAuthority",
-            "type": "publicKey"
+            name: "updateAuthority",
+            type: "publicKey",
           },
           {
-            "name": "baseUri",
-            "type": "string"
-          }
-        ]
-      }
-    }
+            name: "baseUri",
+            type: "string",
+          },
+        ],
+      },
+    },
   ],
-  "errors": [
+  errors: [
     {
-      "code": 6000,
-      "name": "UpdateAuthorityMismatch",
-      "msg": "Incorrect Update Authority"
+      code: 6000,
+      name: "UriExceedsMaxLength",
+      msg: "URI exceeds max length",
     },
     {
-      "code": 6001,
-      "name": "UriExceedsMaxLength",
-      "msg": "URI exceeds max length"
+      code: 6001,
+      name: "PayerMustBeUpdateAuthority",
+      msg: "Payer must be update authority",
     },
     {
-      "code": 6002,
-      "name": "PayerMustBeUpdateAuthority",
-      "msg": "Payer must be update authority"
+      code: 6002,
+      name: "InvalidMetadataAccount",
+      msg: "Invalid Metadata Account",
     },
     {
-      "code": 6003,
-      "name": "InvalidMetadataAccount",
-      "msg": "Invalid Metadata Account"
+      code: 6003,
+      name: "InvalidMetadataNameField",
+      msg: "Invalid Metadata Name Field",
     },
-    {
-      "code": 6004,
-      "name": "InvalidMetadataNameField",
-      "msg": "Invalid Metadata Name Field"
-    }
-  ]
+  ],
 };

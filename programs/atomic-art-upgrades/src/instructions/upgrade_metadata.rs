@@ -24,7 +24,7 @@ pub struct UpgradeMetadata<'info> {
     #[account(mut)]
     pub metadata: AccountInfo<'info>,
     /// CHECK: Verified program
-    #[account(address = mpl_token_metadata::ID)]
+    #[account(address = METADATA_PROGRAM_ID)]
     pub token_metadata_program: AccountInfo<'info>,
 }
 
@@ -35,7 +35,7 @@ pub fn upgrade_metadata_handler(ctx: Context<UpgradeMetadata>) -> Result<()> {
     // only the update authority can relinquish the metadata update authority
     require!(
         upgrade_config.update_authority == *ctx.accounts.payer.key,
-        CustomError::UpdateAuthorityMismatch,
+        CustomError::PayerMustBeUpdateAuthority,
     );
 
     // assert correct metadata account

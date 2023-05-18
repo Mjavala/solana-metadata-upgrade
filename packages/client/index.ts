@@ -6,14 +6,21 @@ import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { Metaplex, walletAdapterIdentity } from "@metaplex-foundation/js";
 
 export const PROGRAM_ID = new PublicKey(
-    "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+  "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 );
 
-export const METADATA_PROGRAM_ID = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
-
+export const METADATA_PROGRAM_ID = new PublicKey(
+  "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+);
 
 export const setUpAnchor = (wallet?: NodeWallet) => {
-    return wallet ? new AnchorProvider(AnchorProvider.env().connection, wallet, AnchorProvider.env().opts) : AnchorProvider.env();  
+  return wallet
+    ? new AnchorProvider(
+        AnchorProvider.env().connection,
+        wallet,
+        AnchorProvider.env().opts
+      )
+    : AnchorProvider.env();
 };
 
 export const confirm = (connection: Connection) => async (txSig: string) =>
@@ -23,167 +30,178 @@ export const confirm = (connection: Connection) => async (txSig: string) =>
   });
 
 export interface AtomicArtUpgradesConfig {
-    updateAuthority: PublicKey;
-    collection: PublicKey;
-    baseUri: string;
-    bump: number;
+  updateAuthority: PublicKey;
+  collection: PublicKey;
+  baseUri: string;
+  bump: number;
 }
 
 export class AtomicArtUpgradesClient {
-    config: AtomicArtUpgradesConfig | undefined;
-    upgradeConfigAddress: PublicKey | undefined;
-    readonly metaplex: Metaplex;
-    readonly program: anchor.Program<AtomicArtUpgrades>;
+  config: AtomicArtUpgradesConfig | undefined;
+  upgradeConfigAddress: PublicKey | undefined;
+  readonly metaplex: Metaplex;
+  readonly program: anchor.Program<AtomicArtUpgrades>;
 
-    constructor(readonly provider: anchor.AnchorProvider) {
-        this.program = new anchor.Program(IDL, PROGRAM_ID, provider);
-        this.metaplex = Metaplex.make(provider.connection).use(walletAdapterIdentity(provider.wallet))
-    }
+  constructor(readonly provider: anchor.AnchorProvider) {
+    this.program = new anchor.Program(IDL, PROGRAM_ID, provider);
+    this.metaplex = Metaplex.make(provider.connection).use(
+      walletAdapterIdentity(provider.wallet)
+    );
+  }
 
-    private async init(upgradeConfigAddress: PublicKey) {
-        const upgradeConfig = await this.program.account.upgradeConfig.fetch(upgradeConfigAddress);
+  private async init(upgradeConfigAddress: PublicKey) {
+    const upgradeConfig = await this.program.account.upgradeConfig.fetch(
+      upgradeConfigAddress
+    );
 
-        this.config = {
-            updateAuthority: upgradeConfig.updateAuthority,
-            collection: upgradeConfig.collectionMint,
-            baseUri: upgradeConfig.baseUri,
-            bump: upgradeConfig.bump[0],
-        };
+    this.config = {
+      updateAuthority: upgradeConfig.updateAuthority,
+      collection: upgradeConfig.collectionMint,
+      baseUri: upgradeConfig.baseUri,
+      bump: upgradeConfig.bump[0],
+    };
 
-        this.upgradeConfigAddress = upgradeConfigAddress;
-    }
+    this.upgradeConfigAddress = upgradeConfigAddress;
+  }
 
-    public static async getUpgradeConfigAddress(collection: PublicKey) {
-        return PublicKey.findProgramAddressSync(
-            [Buffer.from("upgrade_config"), collection.toBuffer()],
-            PROGRAM_ID
-        )
-    }
+  public static async getUpgradeConfigAddress(collection: PublicKey) {
+    return PublicKey.findProgramAddressSync(
+      [Buffer.from("upgrade_config"), collection.toBuffer()],
+      PROGRAM_ID
+    );
+  }
 
-    public static async fetchUpgradeConfigData(upgradeConfigAddress: PublicKey) {
-        const client = new AtomicArtUpgradesClient(setUpAnchor());
-        return client.program.account.upgradeConfig.fetch(upgradeConfigAddress);
-    }
+  public static async fetchUpgradeConfigData(upgradeConfigAddress: PublicKey) {
+    const client = new AtomicArtUpgradesClient(setUpAnchor());
+    return client.program.account.upgradeConfig.fetch(upgradeConfigAddress);
+  }
 
-    public static async createUpgradeConfig(
-        updateAuthority: PublicKey,
-        collectionMint: PublicKey,
-        baseUri: string,
-    ): Promise<AtomicArtUpgradesClient> {
-        const client = new AtomicArtUpgradesClient(setUpAnchor());
+  public static async createUpgradeConfig(
+    updateAuthority: PublicKey,
+    collectionMint: PublicKey,
+    baseUri: string
+  ): Promise<AtomicArtUpgradesClient> {
+    const client = new AtomicArtUpgradesClient(setUpAnchor());
 
-        const upgradeConfigAddress = await AtomicArtUpgradesClient.getUpgradeConfigAddress(collectionMint);
+    const upgradeConfigAddress =
+      await AtomicArtUpgradesClient.getUpgradeConfigAddress(collectionMint);
 
-        const accounts = {
-            payer: client.provider.wallet.publicKey,
-            upgradeConfig: upgradeConfigAddress[0],
-            collectionMint,
-            systemProgram: SystemProgram.programId,
-        }
+    const accounts = {
+      payer: client.provider.wallet.publicKey,
+      upgradeConfig: upgradeConfigAddress[0],
+      collectionMint,
+      systemProgram: SystemProgram.programId,
+    };
 
-        await client.program.methods
-        .registerUpgradeConfig({
-            updateAuthority,
-            collectionMint,
-            baseUri,
-        })
-        .accounts(accounts)
-        .rpc()
-        .then(() => {
-            confirm(client.provider.connection);
-        })
-        await client.init(upgradeConfigAddress[0]);
+    await client.program.methods
+      .registerUpgradeConfig({
+        updateAuthority,
+        collectionMint,
+        baseUri,
+      })
+      .accounts(accounts)
+      .rpc()
+      .then(() => {
+        confirm(client.provider.connection);
+      });
+    await client.init(upgradeConfigAddress[0]);
 
-        return client;
-    }
+    return client;
+  }
 
-    public static async updateUpgradeConfig(
-        updateAuthority: PublicKey,
-        collectionMint: PublicKey,
-        baseUri: string,
-        wallet?: NodeWallet,
-    ): Promise<AtomicArtUpgradesClient> {
-        const client = new AtomicArtUpgradesClient(setUpAnchor(wallet));
+  public static async updateUpgradeConfig(
+    updateAuthority: PublicKey,
+    collectionMint: PublicKey,
+    baseUri: string,
+    wallet?: NodeWallet
+  ): Promise<AtomicArtUpgradesClient> {
+    const client = new AtomicArtUpgradesClient(setUpAnchor(wallet));
 
-        const upgradeConfigAddress = await AtomicArtUpgradesClient.getUpgradeConfigAddress(collectionMint);
+    const upgradeConfigAddress =
+      await AtomicArtUpgradesClient.getUpgradeConfigAddress(collectionMint);
 
-        const accounts = {
-            payer: client.provider.wallet.publicKey,
-            upgradeConfig: upgradeConfigAddress[0],
-            collectionMint,
-        };
+    const accounts = {
+      payer: client.provider.wallet.publicKey,
+      upgradeConfig: upgradeConfigAddress[0],
+      collectionMint,
+    };
 
-        await client.program.methods
-            .updateUpgradeConfig({
-                    updateAuthority,
-                    baseUri,
-            })
-            .accounts(accounts)
-            .rpc()
-            .then(() => {
-                confirm(client.provider.connection);
-            })
+    await client.program.methods
+      .updateUpgradeConfig({
+        updateAuthority,
+        baseUri,
+      })
+      .accounts(accounts)
+      .rpc()
+      .then(() => {
+        confirm(client.provider.connection);
+      });
 
-        await client.init(upgradeConfigAddress[0]);
+    await client.init(upgradeConfigAddress[0]);
 
-        return client;
-    }
+    return client;
+  }
 
-    public static async relinquishUpgradeAuthority(
-        updateAuthority: PublicKey,
-        collectionMint: PublicKey,
-        mint: PublicKey,
-        metadata: PublicKey,
-    ): Promise<AtomicArtUpgradesClient> {
-        const client = new AtomicArtUpgradesClient(setUpAnchor());
+  public static async relinquishUpgradeAuthority(
+    updateAuthority: PublicKey,
+    collectionMint: PublicKey,
+    mint: PublicKey,
+    metadata: PublicKey
+  ): Promise<AtomicArtUpgradesClient> {
+    const client = new AtomicArtUpgradesClient(setUpAnchor());
 
-        const upgradeConfigAddress = await AtomicArtUpgradesClient.getUpgradeConfigAddress(collectionMint);
+    const upgradeConfigAddress =
+      await AtomicArtUpgradesClient.getUpgradeConfigAddress(collectionMint);
 
-        const accounts = {
-            payer: client.provider.wallet.publicKey,
-            upgradeConfig: upgradeConfigAddress[0],
-            mint,
-            metadata,
-            tokenMetadataProgram: METADATA_PROGRAM_ID
-        };
+    const accounts = {
+      payer: client.provider.wallet.publicKey,
+      upgradeConfig: upgradeConfigAddress[0],
+      mint,
+      metadata,
+      tokenMetadataProgram: METADATA_PROGRAM_ID,
+    };
 
-        await client.program.methods
-            .relinquishUpdateAuthority(updateAuthority)
-            .accounts(accounts)
-            .rpc()
-            .then(() => {confirm(client.provider.connection)})
+    await client.program.methods
+      .relinquishUpdateAuthority(updateAuthority)
+      .accounts(accounts)
+      .rpc()
+      .then(() => {
+        confirm(client.provider.connection);
+      });
 
-        await client.init(upgradeConfigAddress[0]);
+    await client.init(upgradeConfigAddress[0]);
 
-        return client;
+    return client;
+  }
 
-    }
+  public static async upgradeMetadata(
+    collectionMint: PublicKey,
+    mint: PublicKey,
+    metadata: PublicKey
+  ): Promise<AtomicArtUpgradesClient> {
+    const client = new AtomicArtUpgradesClient(setUpAnchor());
 
-    public static async upgradeMetadata(
-        collectionMint: PublicKey,
-        mint: PublicKey,
-        metadata: PublicKey,
-    ): Promise<AtomicArtUpgradesClient> {
-        const client = new AtomicArtUpgradesClient(setUpAnchor());
+    const upgradeConfigAddress =
+      await AtomicArtUpgradesClient.getUpgradeConfigAddress(collectionMint);
 
-        const upgradeConfigAddress = await AtomicArtUpgradesClient.getUpgradeConfigAddress(collectionMint);
+    const accounts = {
+      payer: client.provider.wallet.publicKey,
+      upgradeConfig: upgradeConfigAddress[0],
+      mint,
+      metadata,
+      tokenMetadataProgram: METADATA_PROGRAM_ID,
+    };
 
-        const accounts = {
-            payer: client.provider.wallet.publicKey,
-            upgradeConfig: upgradeConfigAddress[0],
-            mint,
-            metadata,
-            tokenMetadataProgram: METADATA_PROGRAM_ID
-        };
+    await client.program.methods
+      .upgradeMetadata()
+      .accounts(accounts)
+      .rpc()
+      .then(() => {
+        confirm(client.provider.connection);
+      });
 
-        await client.program.methods
-            .upgradeMetadata()
-            .accounts(accounts)
-            .rpc()
-            .then(() => {confirm(client.provider.connection)})
+    await client.init(upgradeConfigAddress[0]);
 
-        await client.init(upgradeConfigAddress[0]);
-
-        return client;
-    }
+    return client;
+  }
 }

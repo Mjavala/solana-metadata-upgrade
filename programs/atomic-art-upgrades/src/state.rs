@@ -50,4 +50,7 @@ pub struct UpdateUpgradeConfigParams {
     pub base_uri: String,
 }
 
+// Max URI length is a total of 200, but we need to account for numbers in the name field for nfts.
+pub const MAX_BASE_URI_LEN: usize = 150;
+
 

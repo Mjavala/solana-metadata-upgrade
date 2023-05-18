@@ -1,8 +1,7 @@
 use anchor_lang::prelude::*;
-use mpl_token_metadata::state::MAX_URI_LENGTH;
 use anchor_spl::token::Mint;
 use crate::error::CustomError;
-use crate::state::{UpgradeConfig, CreateUpgradeConfigParams};
+use crate::state::{UpgradeConfig, CreateUpgradeConfigParams, MAX_BASE_URI_LEN};
 
 
 #[derive(Accounts)]
@@ -28,7 +27,7 @@ pub struct CreateUpgradeConfig<'info> {
 pub fn create_upgrade_config_handler(ctx: Context<CreateUpgradeConfig>, config: CreateUpgradeConfigParams) -> Result<()> {
     // Check the length of the metadata uri provided.
     require!(
-        config.base_uri.len() <= MAX_URI_LENGTH,
+        config.base_uri.len() <= MAX_BASE_URI_LEN,
         CustomError::UriExceedsMaxLength,
     );
 
