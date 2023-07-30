@@ -71,6 +71,13 @@ export class AtomicArtUpgradesClient {
     );
   }
 
+  public static async getUpgradeAccount(mint: PublicKey) {
+    return PublicKey.findProgramAddressSync(
+      [Buffer.from("upgrade"), mint.toBuffer()],
+      PROGRAM_ID
+    );
+  }
+
   public static async fetchUpgradeConfigData(upgradeConfigAddress: PublicKey) {
     const client = new AtomicArtUpgradesClient(setUpAnchor());
     return client.program.account.upgradeConfig.fetch(upgradeConfigAddress);
@@ -184,9 +191,13 @@ export class AtomicArtUpgradesClient {
     const upgradeConfigAddress =
       await AtomicArtUpgradesClient.getUpgradeConfigAddress(collectionMint);
 
+    const upgradeAccount = 
+      await AtomicArtUpgradesClient.getUpgradeAccount(mint);
+
     const accounts = {
       payer: client.provider.wallet.publicKey,
       upgradeConfig: upgradeConfigAddress[0],
+      upgradeAccount: upgradeAccount[0],
       mint,
       metadata,
       tokenMetadataProgram: METADATA_PROGRAM_ID,
