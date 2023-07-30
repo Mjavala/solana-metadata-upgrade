@@ -10,6 +10,8 @@ mod validation;
 mod instructions;
 use instructions::*;
 
+mod seeds;
+
 declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
 #[program]
